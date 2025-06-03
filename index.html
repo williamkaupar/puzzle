@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Minds Image Uploader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: #141619; /* Dark Gray/Black */
+            color: #B3B4BD; /* Light Gray */
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header {
+            background: #2C2E3A; /* Charcoal Gray */
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeInDown 1s;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0A21C0, #050A44); /* Bright Blue to Deep Navy Blue */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+        }
+
+        .logo-circle span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #B3B4BD; /* Light Gray */
+        }
+
+        .header h1 {
+            color: #0A21C0; /* Bright Blue */
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navigation Styles */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #B3B4BD; /* Light Gray */
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #0A21C0; /* Bright Blue */
+            color: #B3B4BD; /* Light Gray */
+            transform: translateY(-2px);
+        }
+
+        /* Popup Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2C2E3A; /* Charcoal Gray */
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s;
+        }
+
+        .modal-content h2 {
+            color: #0A21C0; /* Bright Blue */
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            color: #B3B4BD; /* Light Gray */
+            line-height: 1.6;
+        }
+
+        .close-btn {
+            background: #0A21C0; /* Bright Blue */
+            color: #B3B4BD; /* Light Gray */
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #050A44; /* Deep Navy Blue */
+        }
+
+        /* Container Styles */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: #2C2E3A; /* Charcoal Gray */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin: 2rem auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .upload-section {
+            border: 2px dashed #0A21C0; /* Bright Blue */
+            border-radius: 1rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            margin-bottom: 2rem;
+            background: rgba(10, 33, 192, 0.05); /* Bright Blue with opacity */
+        }
+
+        .upload-section:hover {
+            border-color: #050A44; /* Deep Navy Blue */
+            background: rgba(5, 10, 68, 0.1); /* Deep Navy Blue with opacity */
+        }
+
+        .upload-section.dragover {
+            border-color: #050A44; /* Deep Navy Blue */
+            background: rgba(5, 10, 68, 0.2); /* Deep Navy Blue with opacity */
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .image-card {
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: #141619; /* Dark Gray/Black */
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            padding: 1rem;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #0A21C0, #050A44); /* Bright Blue to Deep Navy Blue */
+            color: #B3B4BD; /* Light Gray */
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(10, 33, 192, 0.3); /* Bright Blue */
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #0A21C0, #050A44); /* Bright Blue to Deep Navy Blue */
+            padding: 0.75rem 2rem;
+            margin-top: 1rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: #141619; /* Dark Gray/Black */
+            border-radius: 4px;
+            margin: 1.5rem auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0A21C0, #050A44); /* Bright Blue to Deep Navy Blue */
+            transition: width 0.4s ease;
+            border-radius: 4px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .processing-text {
+            animation: pulse 1.5s infinite;
+            color: #0A21C0; /* Bright Blue */
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: #2C2E3A; /* Charcoal Gray */
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: #B3B4BD; /* Light Gray */
+            border-top: 2px solid #0A21C0; /* Bright Blue */
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #B3B4BD; /* Light Gray */
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #0A21C0; /* Bright Blue */
+            transform: translateY(-2px);
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            color: #B3B4BD; /* Light Gray */
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #0A21C0; /* Bright Blue */
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-section {
+                padding: 3rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-circle">
+                <span>PM</span>
+            </div>
+            <h1>Prompt Minds Image Upscaler</h1>
+        </div>
+        <div class="toolbar">
+            <ul class="nav-links">
+                <li><a href="#" onclick="openModal('home')">Home</a></li>
+                <li><a href="#" onclick="openModal('about')">About</a></li>
+                <li><a href="#" onclick="openModal('services')">Services</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Popup Modals -->
+    <div id="homeModal" class="modal">
+        <div class="modal-content">
+            <h2>Home</h2>
+            <p>Welcome to Prompt Minds Image Uploader! Upload your images and enhance them with our powerful tools.</p>
+            <button class="close-btn" onclick="closeModal('homeModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <h2>About</h2>
+            <p>Prompt Minds Image Uploader is a cutting-edge tool designed to help you enhance and process your images with ease.</p>
+            <button class="close-btn" onclick="closeModal('aboutModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="servicesModal" class="modal">
+        <div class="modal-content">
+            <h2>Services</h2>
+            <p>We offer a range of services including image enhancement, background removal, and more. Try it now!</p>
+            <button class="close-btn" onclick="closeModal('servicesModal')">Close</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="upload-section" id="dropZone">
+            <input type="file" id="fileInput" hidden accept="image/*">
+            <div class="upload-content">
+                <svg style="width: 64px; height: 64px; margin-bottom: 1rem;" fill="none" stroke="#0A21C0" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #B3B4BD;">Drag & Drop Your Image</p>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">or</p>
+                <label for="fileInput" class="button">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="#B3B4BD" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Browse Files
+                </label>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p class="processing-text">Enhancing Your Image...</p>
+        </div>
+
+        <div class="image-grid" id="resultSection">
+            <div class="image-card">
+                <img id="originalPreview" class="image-preview" alt="Original">
+                <p style="text-align: center; padding: 1rem; font-weight: 500; color: #B3B4BD;">Original</p>
+            </div>
+            <div class="image-card">
+                <img id="enhancedPreview" class="image-preview" alt="Enhanced">
+                <p style="text-align: center; padding: 1rem; font-weight: 500; color: #B3B4BD;">Enhanced</p>
+                <button class="button download-btn" id="downloadBtn" style="display: none; margin: 1rem auto;">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="#B3B4BD" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms of Service</a>
+            <a href="#contact">Contact Us</a>
+        </div>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <p>&copy; 2023 Prompt Minds. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const API_KEY = 'eyJraWQiOiI5NzIxYmUzNi1iMjcwLTQ5ZDUtOTc1Ni05ZDU5N2M4NmIwNTEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhdXRoLXNlcnZpY2UtZTVjMDk1MWMtODhhYy00NTc3LTg2MzktNmIyY2JjNGE4OGZjIiwiYXVkIjoiNDc5MTA5NjQyMDIzMTAxIiwibmJmIjoxNzQxNDEzNjkwLCJzY29wZSI6WyJiMmItYXBpLmdlbl9haSIsImIyYi1hcGkuaW1hZ2VfYXBpIl0sImlzcyI6Imh0dHBzOi8vYXBpLnBpY3NhcnQuY29tL3Rva2VuLXNlcnZpY2UiLCJvd25lcklkIjoiNDc5MTA5NjQyMDIzMTAxIiwiaWF0IjoxNzQxNDEzNjg5LCJqdGkiOiIwZWVkZTk5Mi1kMjU3LTRiYmQtOWEwMS0yNGI1NjQzOWI3M2QifQ.aMCpTYiuJn47LL-KKXz64emBJbwXgaqIvXwQAuBCS1A0P2DS17HnvLFEMxOPCnWA-ZPQfvKS13nxTZw-YK4S6TH6sCyIUgxNrPMUMgMLTgVc7OzCbvOuqp99v4cgOGr4daIK24V-rwr-eJ59_cHygzDdQY2tbszFhaydh8fTAc7VC562bjt6XBLjyP5_5Op6kzzaOndJ-_kUSZFtfIYZPjYLGipVr-sCMCpP_0mEmNa3A2_GLNIXXwJrNIT7PvCovm2If5T3WFuvp1InRJAH-lxU0-5mONyrki6JhP3gyGzctviZsJIn-86ikEPt2pev-QpTojVJ-Ob4vV7SqMDk7Q';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const originalPreview = document.getElementById('originalPreview');
+        const enhancedPreview = document.getElementById('enhancedPreview');
+        const resultSection = document.getElementById('resultSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loading = document.querySelector('.loading');
+        const progressFill = document.querySelector('.progress-fill');
+
+        // Drag and drop handlers
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+            dropZone.addEventListener(event, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        dropZone.addEventListener('dragover', () => {
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+
+        async function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            if (files.length) await handleFile(files[0]);
+        }
+
+        async function handleFileSelect(e) {
+            await handleFile(e.target.files[0]);
+        }
+
+        async function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalPreview.src = e.target.result;
+                dropZone.style.display = 'none';
+                resultSection.style.display = 'grid';
+                startEnhancement(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function startEnhancement(file) {
+            loading.style.display = 'block';
+            progressFill.style.width = '30%';
+
+            const formData = new FormData();
+            formData.append('upscale_factor', '2');
+            formData.append('format', 'JPG');
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('https://api.picsart.io/tools/1.0/upscale', {
+                    method: 'POST',
+                    headers: {
+                        'X-Picsart-API-Key': API_KEY
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                progressFill.style.width = '100%';
+
+                if (data.data.url) {
+                    enhancedPreview.src = data.data.url;
+                    downloadBtn.style.display = 'flex';
+                    downloadBtn.onclick = () => downloadImage(data.data.url);
+                }
+            } catch (error) {
+                console.error('Enhancement Error:', error);
+                alert('Enhancement failed. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        }
+
+        function downloadImage(url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `enhanced-${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(`${modalId}Modal`).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+    </script>
+</body><script type="text/javascript">
+	atOptions = {
+		'key' : '9812faa69c7700e4d14c94737689c4bf',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/9812faa69c7700e4d14c94737689c4bf/invoke.js"></script>
+</html>
